@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { diffWords } from 'diff';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
 export const ComparePdf: React.FC = () => {
   const [file1, setFile1] = useState<File | null>(null);
