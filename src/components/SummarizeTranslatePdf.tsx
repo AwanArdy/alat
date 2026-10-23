@@ -19,19 +19,36 @@ export const SummarizeTranslatePdf: React.FC = () => {
       formData.append('targetLang', targetLang);
     }
 
+    const t0 = performance.now();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 180_000); // timeout 3 menit
+
     try {
+      console.log(`[${action}] 1. POST ${BACKEND_URL}/api/${action} (${(file.size / 1024).toFixed(1)} KB)`);
       const response = await fetch(`${BACKEND_URL}/api/${action}`, {
         method: 'POST',
         body: formData,
+        signal: controller.signal,
       });
+      console.log(`[${action}] 2. HTTP ${response.status} (${(performance.now() - t0).toFixed(0)} ms)`);
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Terjadi kesalahan');
+      if (!response.ok) {
+        console.error(`[${action}] 3. error:`, data.error || 'Terjadi kesalahan');
+        throw new Error(data.error || 'Terjadi kesalahan');
+      }
 
       setResult(data.summary || data.translation);
+      console.log(`[${action}] 4. selesai (${(performance.now() - t0).toFixed(0)} ms)`);
     } catch (err: any) {
-      alert(err.message);
+      if (err.name === 'AbortError') {
+        console.error(`[${action}] dibatalkan: timeout 3 menit`);
+        alert('Permintaan melebihi 3 menit dan dibatalkan. Coba PDF lebih kecil.');
+      } else {
+        alert(err.message);
+      }
     } finally {
+      clearTimeout(timeout);
       setLoading(false);
     }
   };
