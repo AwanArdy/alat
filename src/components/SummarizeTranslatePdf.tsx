@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const BACKEND_URL = 'http://localhost:8787';
+const BACKEND_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8787';
 
 export const SummarizeTranslatePdf: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
